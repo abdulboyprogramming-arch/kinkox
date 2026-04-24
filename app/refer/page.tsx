@@ -7,6 +7,15 @@ import { useNotification } from '@/contexts/NotificationContext';
 import { copyToClipboard, generateReferralCode } from '@/lib/utils';
 import { useSavingsData } from '@/hooks/useSavingsData';
 
+// Type for saved referral from localStorage
+interface SavedReferral {
+  id: string;
+  address: string;
+  date: string;
+  amount: number;
+  status: 'active' | 'completed';
+}
+
 interface Referral {
   id: string;
   address: string;
@@ -15,14 +24,20 @@ interface Referral {
   status: 'active' | 'completed';
 }
 
+interface Rewards {
+  totalRewards: number;
+  nextReward: number;
+  nextTier: number;
+}
+
 export default function ReferPage() {
   const { address, isConnected } = useAccount();
   const { referralEarnings, updateReferralEarnings } = useSavingsData();
   const { showSuccess } = useNotification();
-  const [referralCode, setReferralCode] = useState('');
-  const [isCopied, setIsCopied] = useState(false);
+  const [referralCode, setReferralCode] = useState<string>('');
+  const [isCopied, setIsCopied] = useState<boolean>(false);
   const [referrals, setReferrals] = useState<Referral[]>([]);
-  const [referralLink, setReferralLink] = useState('');
+  const [referralLink, setReferralLink] = useState<string>('');
 
   useEffect(() => {
     if (address) {
@@ -38,13 +53,16 @@ export default function ReferPage() {
       // Load referrals
       const savedReferrals = localStorage.getItem(`referrals_${address}`);
       if (savedReferrals) {
-        const parsed = JSON.parse(savedReferrals);
-        setReferrals(parsed.map((r: any) => ({ ...r, date: new Date(r.date) })));
+        const parsed: SavedReferral[] = JSON.parse(savedReferrals);
+        setReferrals(parsed.map((r: SavedReferral) => ({ 
+          ...r, 
+          date: new Date(r.date) 
+        })));
       }
     }
   }, [address]);
 
-  const handleCopyLink = async () => {
+  const handleCopyLink = async (): Promise<void> => {
     const success = await copyToClipboard(referralLink);
     if (success) {
       setIsCopied(true);
@@ -53,31 +71,31 @@ export default function ReferPage() {
     }
   };
 
-  const handleCopyCode = async () => {
+  const handleCopyCode = async (): Promise<void> => {
     const success = await copyToClipboard(referralCode);
     if (success) {
       showSuccess('Referral code copied!');
     }
   };
 
-  const shareOnTwitter = () => {
+  const shareOnTwitter = (): void => {
     const text = `Join me on KinkoX to earn interest on your ETH savings! Use my referral code ${referralCode} to get started. 🚀💰`;
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };
 
-  const shareOnTelegram = () => {
+  const shareOnTelegram = (): void => {
     const text = `Join me on KinkoX to earn interest on your ETH savings! Use my referral code ${referralCode} to get started. 🚀💰\n\n${referralLink}`;
     const url = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };
 
-  const shareOnLinkedIn = () => {
+  const shareOnLinkedIn = (): void => {
     const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(referralLink)}`;
     window.open(url, '_blank');
   };
 
-  const calculateRewards = () => {
+  const calculateRewards = (): Rewards => {
     // 5% of each referred friend's deposit
     const totalRewards = referralEarnings;
     const nextTier = referrals.length + 1;
@@ -92,7 +110,7 @@ export default function ReferPage() {
     return (
       <div className="container mx-auto px-4 py-12">
         <div className="text-center py-20">
-          <Users className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+          <Users className="w-16 h-16 mx-auto text-gray-400 mb-4" aria-hidden="true" />
           <h2 className="text-2xl font-bold mb-2">Connect Your Wallet</h2>
           <p className="text-gray-600 dark:text-gray-400">
             Please connect your wallet to access the referral program
@@ -118,7 +136,7 @@ export default function ReferPage() {
           {/* Hero Section */}
           <div className="card bg-gradient-to-r from-primary-600 to-primary-500 text-white mb-6">
             <div className="text-center">
-              <Gift className="w-16 h-16 mx-auto mb-4 opacity-90" />
+              <Gift className="w-16 h-16 mx-auto mb-4 opacity-90" aria-hidden="true" />
               <h2 className="text-2xl font-bold mb-2">Earn Up to 5% Rewards</h2>
               <p className="text-primary-100 mb-6">
                 Get 5% of every deposit made by your referrals
@@ -139,37 +157,53 @@ export default function ReferPage() {
           {/* Referral Links */}
           <div className="card mb-6">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <Share2 className="w-5 h-5 text-primary-600" />
+              <Share2 className="w-5 h-5 text-primary-600" aria-hidden="true" />
               Share Your Referral Link
             </h3>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Your Referral Link</label>
+                <label htmlFor="referralLinkInput" className="block text-sm font-medium mb-2">
+                  Your Referral Link
+                </label>
                 <div className="flex gap-2">
                   <input
+                    id="referralLinkInput"
                     type="text"
                     value={referralLink}
                     readOnly
                     className="input-primary flex-1"
+                    aria-label="Your referral link (read only)"
                   />
-                  <button onClick={handleCopyLink} className="btn-secondary px-4">
-                    {isCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  <button 
+                    onClick={handleCopyLink} 
+                    className="btn-secondary px-4"
+                    aria-label="Copy referral link to clipboard"
+                  >
+                    {isCopied ? <Check className="w-4 h-4" aria-hidden="true" /> : <Copy className="w-4 h-4" aria-hidden="true" />}
                   </button>
                 </div>
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-2">Your Referral Code</label>
+                <label htmlFor="referralCodeInput" className="block text-sm font-medium mb-2">
+                  Your Referral Code
+                </label>
                 <div className="flex gap-2">
                   <input
+                    id="referralCodeInput"
                     type="text"
                     value={referralCode}
                     readOnly
                     className="input-primary flex-1 font-mono text-lg text-center"
+                    aria-label="Your referral code (read only)"
                   />
-                  <button onClick={handleCopyCode} className="btn-secondary px-4">
-                    <Copy className="w-4 h-4" />
+                  <button 
+                    onClick={handleCopyCode} 
+                    className="btn-secondary px-4"
+                    aria-label="Copy referral code to clipboard"
+                  >
+                    <Copy className="w-4 h-4" aria-hidden="true" />
                   </button>
                 </div>
               </div>
@@ -183,22 +217,25 @@ export default function ReferPage() {
               <button
                 onClick={shareOnTwitter}
                 className="flex-1 py-3 rounded-lg bg-black text-white hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+                aria-label="Share referral link on Twitter"
               >
-                <Twitter className="w-5 h-5" />
+                <Twitter className="w-5 h-5" aria-hidden="true" />
                 Twitter
               </button>
               <button
                 onClick={shareOnTelegram}
                 className="flex-1 py-3 rounded-lg bg-[#0088cc] text-white hover:bg-[#006699] transition-colors flex items-center justify-center gap-2"
+                aria-label="Share referral link on Telegram"
               >
-                <MessageCircle className="w-5 h-5" />
+                <MessageCircle className="w-5 h-5" aria-hidden="true" />
                 Telegram
               </button>
               <button
                 onClick={shareOnLinkedIn}
                 className="flex-1 py-3 rounded-lg bg-[#0077b5] text-white hover:bg-[#005582] transition-colors flex items-center justify-center gap-2"
+                aria-label="Share referral link on LinkedIn"
               >
-                <Linkedin className="w-5 h-5" />
+                <Linkedin className="w-5 h-5" aria-hidden="true" />
                 LinkedIn
               </button>
             </div>
@@ -249,7 +286,7 @@ export default function ReferPage() {
         <div className="lg:col-span-1">
           <div className="card mb-6">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-green-600" />
+              <TrendingUp className="w-5 h-5 text-green-600" aria-hidden="true" />
               Your Rewards
             </h3>
             <div className="space-y-3">
@@ -272,7 +309,7 @@ export default function ReferPage() {
           {referrals.length > 0 && (
             <div className="card">
               <h3 className="font-semibold mb-4 flex items-center gap-2">
-                <Users className="w-5 h-5 text-primary-600" />
+                <Users className="w-5 h-5 text-primary-600" aria-hidden="true" />
                 Your Referrals
               </h3>
               <div className="space-y-3 max-h-96 overflow-y-auto">
