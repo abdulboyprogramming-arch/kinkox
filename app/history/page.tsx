@@ -20,6 +20,17 @@ interface Transaction {
   details?: string;
 }
 
+// Type for saved transaction from localStorage
+interface SavedTransaction {
+  id: string;
+  type: 'deposit' | 'withdraw' | 'referral';
+  amount: number;
+  status: 'completed' | 'pending' | 'failed';
+  timestamp: string;
+  txHash?: string;
+  details?: string;
+}
+
 export default function HistoryPage() {
   const { isConnected, address } = useAccount();
   const { savingsHistory } = useSavingsData();
@@ -35,8 +46,8 @@ export default function HistoryPage() {
     if (address) {
       const saved = localStorage.getItem(`transactions_${address}`);
       if (saved) {
-        const parsed = JSON.parse(saved);
-        setTransactions(parsed.map((t: any) => ({
+        const parsed: SavedTransaction[] = JSON.parse(saved);
+        setTransactions(parsed.map((t: SavedTransaction) => ({
           ...t,
           timestamp: new Date(t.timestamp),
         })));
@@ -45,7 +56,7 @@ export default function HistoryPage() {
         const demoTransactions: Transaction[] = [];
         
         // Add savings history transactions
-        savingsHistory.forEach((saving, index) => {
+        savingsHistory.forEach((saving) => {
           demoTransactions.push({
             id: saving.id,
             type: 'deposit',
@@ -94,7 +105,7 @@ export default function HistoryPage() {
     currentPage * itemsPerPage
   );
 
-  const getTypeIcon = (type: string) => {
+  const getTypeIcon = (type: string): string => {
     switch (type) {
       case 'deposit':
         return '📥';
@@ -107,7 +118,7 @@ export default function HistoryPage() {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string): string => {
     switch (status) {
       case 'completed':
         return 'text-green-600 bg-green-100 dark:bg-green-900/20';
@@ -120,7 +131,7 @@ export default function HistoryPage() {
     }
   };
 
-  const generatePDFReport = () => {
+  const generatePDFReport = (): void => {
     const doc = new jsPDF();
     
     // Title
@@ -176,7 +187,7 @@ export default function HistoryPage() {
     return (
       <div className="container mx-auto px-4 py-12">
         <div className="text-center py-20">
-          <Wallet className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+          <Wallet className="w-16 h-16 mx-auto text-gray-400 mb-4" aria-hidden="true" />
           <h2 className="text-2xl font-bold mb-2">Connect Your Wallet</h2>
           <p className="text-gray-600 dark:text-gray-400">
             Please connect your wallet to view your transaction history
@@ -199,15 +210,16 @@ export default function HistoryPage() {
         <button
           onClick={generatePDFReport}
           className="btn-secondary flex items-center gap-2"
+          aria-label="Export transaction history as PDF report"
         >
-          <Download className="w-4 h-4" />
+          <Download className="w-4 h-4" aria-hidden="true" />
           Export PDF Report
         </button>
       </div>
 
       {/* Filters */}
       <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
-        <div className="flex gap-2">
+        <div className="flex gap-2" role="tablist" aria-label="Transaction type filter">
           {(['all', 'deposit', 'withdraw', 'referral'] as const).map((f) => (
             <button
               key={f}
@@ -217,6 +229,9 @@ export default function HistoryPage() {
                   ? 'bg-primary-600 text-white'
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
               }`}
+              role="tab"
+              aria-selected={filter === f}
+              aria-label={`Filter by ${f} transactions`}
             >
               {f}
             </button>
@@ -224,13 +239,14 @@ export default function HistoryPage() {
         </div>
         
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
           <input
             type="text"
             placeholder="Search transactions..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 pr-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            aria-label="Search transactions by ID, hash, or details"
           />
         </div>
       </div>
@@ -258,7 +274,7 @@ export default function HistoryPage() {
               paginatedTransactions.map((tx) => (
                 <tr key={tx.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                   <td className="py-3 px-4">
-                    <span className="text-xl">{getTypeIcon(tx.type)}</span>
+                    <span className="text-xl" aria-hidden="true">{getTypeIcon(tx.type)}</span>
                     <span className="ml-2 capitalize">{tx.type}</span>
                   </td>
                   <td className="py-3 px-4 font-semibold">
@@ -284,23 +300,25 @@ export default function HistoryPage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center gap-2 mt-6">
+        <div className="flex justify-center gap-2 mt-6" aria-label="Pagination navigation">
           <button
-            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            onClick={() => setCurrentPage((p: number) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
             className="p-2 rounded-lg border border-gray-200 dark:border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            aria-label="Previous page"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-4 h-4" aria-hidden="true" />
           </button>
-          <span className="px-4 py-2">
+          <span className="px-4 py-2" aria-label={`Page ${currentPage} of ${totalPages}`}>
             Page {currentPage} of {totalPages}
           </span>
           <button
-            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            onClick={() => setCurrentPage((p: number) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
             className="p-2 rounded-lg border border-gray-200 dark:border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            aria-label="Next page"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
       )}
