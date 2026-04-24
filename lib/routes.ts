@@ -1,20 +1,23 @@
-export const ROUTES = {
-  HOME: '/',
-  DEPOSIT: '/deposit',
-  DASHBOARD: '/dashboard',
-  WITHDRAW: '/withdraw',
-  SETTINGS: '/settings',
-  PROFILE: '/profile',
-  LOGIN: '/login',
-  REGISTER: '/register',
-  VERIFY_2FA: '/verify-2fa',
-  SETUP_PASSKEY: '/setup-passkey',
-} as const;
+export const routes = {
+  home: '/',
+  dashboard: '/dashboard',
+  deposit: '/deposit',
+  history: '/history',
+  profile: '/profile',
+  refer: '/refer',
+  settings: '/settings',
+};
 
-export const NAV_ITEMS = [
-  { label: 'Home', href: ROUTES.HOME, requiresAuth: false },
-  { label: 'Deposit', href: ROUTES.DEPOSIT, requiresAuth: true },
-  { label: 'Dashboard', href: ROUTES.DASHBOARD, requiresAuth: true },
-  { label: 'Withdraw', href: ROUTES.WITHDRAW, requiresAuth: true },
-  { label: 'Settings', href: ROUTES.SETTINGS, requiresAuth: true },
-] as const;
+export const navigation = [
+  { name: 'Dashboard', href: routes.dashboard, icon: 'LayoutDashboard' },
+  { name: 'Deposit', href: routes.deposit, icon: 'ArrowDownCircle' },
+  { name: 'Transaction History', href: routes.history, icon: 'History' },
+  { name: 'Profile', href: routes.profile, icon: 'User' },
+  { name: 'Refer & Earn', href: routes.refer, icon: 'Users' },
+];
+
+export const apiEndpoints = {
+  telegram: '/api/telegram',
+  report: '/api/report',
+  analytics: '/api/analytics',
+};
