@@ -53,14 +53,18 @@ export default function WithdrawModal({ isOpen, onClose, onSuccess }: WithdrawMo
       <div className="bg-white dark:bg-dark-card rounded-2xl w-full max-w-md mx-4 overflow-hidden shadow-2xl">
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">Withdraw Funds</h2>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+          <button 
+            onClick={onClose} 
+            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            aria-label="Close modal"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
         
         <div className="p-6 space-y-6">
           {/* Position Details */}
-          <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 space-y-3">
+          <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 space-y-3" aria-label="Position details">
             <div className="flex justify-between">
               <span className="text-gray-600 dark:text-gray-400">Initial Deposit:</span>
               <span className="font-semibold">{userPosition.amount} ETH</span>
@@ -80,7 +84,7 @@ export default function WithdrawModal({ isOpen, onClose, onSuccess }: WithdrawMo
             <div className="flex items-center gap-3">
               {isMatured ? (
                 <>
-                  <TrendingUp className="w-5 h-5 text-green-600" />
+                  <TrendingUp className="w-5 h-5 text-green-600" aria-hidden="true" />
                   <div>
                     <p className="font-semibold text-green-600 dark:text-green-400">Ready to Withdraw!</p>
                     <p className="text-sm text-green-600/80">Your funds are now available</p>
@@ -88,7 +92,7 @@ export default function WithdrawModal({ isOpen, onClose, onSuccess }: WithdrawMo
                 </>
               ) : (
                 <>
-                  <Clock className="w-5 h-5 text-yellow-600" />
+                  <Clock className="w-5 h-5 text-yellow-600" aria-hidden="true" />
                   <div>
                     <p className="font-semibold text-yellow-600 dark:text-yellow-400">Lock Period Active</p>
                     <p className="text-sm text-yellow-600/80">{timeRemaining}</p>
@@ -100,8 +104,8 @@ export default function WithdrawModal({ isOpen, onClose, onSuccess }: WithdrawMo
           
           {/* Warning */}
           {!isMatured && (
-            <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-              <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg" role="alert">
+              <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
               <p className="text-xs text-red-600 dark:text-red-400">
                 Withdrawing before the lock period ends is not possible. Please wait until your lock period expires.
               </p>
@@ -113,6 +117,7 @@ export default function WithdrawModal({ isOpen, onClose, onSuccess }: WithdrawMo
             onClick={handleWithdraw}
             disabled={isLoading || !isMatured}
             className={`btn-primary w-full ${!isMatured ? 'opacity-50 cursor-not-allowed' : ''}`}
+            aria-label={isMatured ? 'Withdraw funds' : 'Withdrawal not available until lock period ends'}
           >
             {isLoading ? 'Processing...' : `Withdraw ${totalWithInterest.toFixed(6)} ETH`}
           </button>
