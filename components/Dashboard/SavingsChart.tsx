@@ -12,6 +12,9 @@ import {
   Tooltip,
   Legend,
   Filler,
+  ChartData,
+  ChartOptions,
+  TooltipItem,
 } from 'chart.js';
 import { useContract } from '@/hooks/useContract';
 import { calculateTotalReturn } from '@/lib/contract';
@@ -27,9 +30,25 @@ ChartJS.register(
   Filler
 );
 
+// Type for chart dataset
+interface ChartDataset {
+  label: string;
+  data: number[];
+  borderColor: string;
+  backgroundColor: string;
+  fill: boolean;
+  tension: number;
+}
+
+// Type for complete chart data
+interface ChartDataType {
+  labels: string[];
+  datasets: ChartDataset[];
+}
+
 export default function SavingsChart() {
   const { userPosition } = useContract();
-  const [chartData, setChartData] = useState<any>(null);
+  const [chartData, setChartData] = useState<ChartDataType | null>(null);
 
   useEffect(() => {
     if (!userPosition || userPosition.withdrawn) {
@@ -61,9 +80,9 @@ export default function SavingsChart() {
       });
     } else {
       // Generate projection based on user's actual position
-      const months = [];
-      const deposits = [];
-      const withInterest = [];
+      const months: string[] = [];
+      const deposits: number[] = [];
+      const withInterest: number[] = [];
       const startDate = new Date(userPosition.startTime * 1000);
       const endDate = new Date(userPosition.endTime * 1000);
       const totalMonths = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 30));
@@ -75,7 +94,7 @@ export default function SavingsChart() {
         
         const progress = i / totalMonths;
         const currentAmount = userPosition.amount;
-        const finalAmount = calculateTotalReturn(userPosition.amount, totalMonths * 30);
+        const finalAmount = calculateTotalReturn(Number(userPosition.amount), totalMonths * 30);
         const interpolated = currentAmount + (finalAmount - currentAmount) * progress;
         
         deposits.push(currentAmount);
@@ -106,7 +125,7 @@ export default function SavingsChart() {
     }
   }, [userPosition]);
 
-  const options = {
+  const options: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -121,16 +140,17 @@ export default function SavingsChart() {
         mode: 'index' as const,
         intersect: false,
         callbacks: {
-          label: function(context: any) {
+          label: function(context: TooltipItem<'line'>) {
             let label = context.dataset.label || '';
             if (label) {
               label += ': ';
             }
-            if (context.parsed.y !== null) {
+            const value = context.parsed.y;
+            if (value !== null && value !== undefined) {
               label += new Intl.NumberFormat('en-US', {
                 minimumFractionDigits: 4,
                 maximumFractionDigits: 4,
-              }).format(context.parsed.y) + ' ETH';
+              }).format(value) + ' ETH';
             }
             return label;
           }
@@ -145,8 +165,9 @@ export default function SavingsChart() {
           text: 'Amount (ETH)',
         },
         ticks: {
-          callback: function(value: any) {
-            return value.toFixed(2) + ' ETH';
+          callback: function(value: string | number) {
+            const numValue = typeof value === 'string' ? parseFloat(value) : value;
+            return numValue.toFixed(2) + ' ETH';
           }
         }
       },
@@ -168,7 +189,11 @@ export default function SavingsChart() {
     return (
       <div className="h-80 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div 
+            className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"
+            role="status"
+            aria-label="Loading chart data"
+          />
           <p className="text-gray-500">Loading chart data...</p>
         </div>
       </div>
@@ -177,7 +202,7 @@ export default function SavingsChart() {
 
   return (
     <div className="h-80">
-      <Line data={chartData} options={options} />
+      <Line data={chartData as ChartData<'line'>} options={options} />
     </div>
   );
 }
