@@ -1,15 +1,27 @@
 'use client';
 
-import { useAccount, useWriteContract, useReadContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useAccount, useWriteContract, useReadContract } from 'wagmi';
 import { CONTRACT_ADDRESS, CONTRACT_ABI, formatToWei, formatETHFromWei } from '@/lib/contract';
 import { useNotification } from '@/contexts/NotificationContext';
 import { parseErrorMessage } from '@/lib/utils';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+
+// Type for the position data returned from the contract
+type PositionData = readonly [bigint, bigint, bigint, boolean];
+
+// Type for the parsed user position
+interface UserPosition {
+  amount: string;
+  startTime: number;
+  endTime: number;
+  withdrawn: boolean;
+  rawAmount: bigint;
+}
 
 export function useContract() {
   const { address, isConnected } = useAccount();
   const { showSuccess, showError } = useNotification();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   
   const { writeContractAsync, isPending: isWritePending } = useWriteContract();
   
@@ -42,17 +54,17 @@ export function useContract() {
     functionName: 'getMaxLockDuration',
   });
 
-  // Parse position data
-  const userPosition = positionData ? {
-    amount: formatETHFromWei(positionData[0] as bigint),
+  // Parse position data with proper type checking
+  const userPosition: UserPosition | null = positionData ? {
+    amount: formatETHFromWei(positionData[0]),
     startTime: Number(positionData[1]),
     endTime: Number(positionData[2]),
-    withdrawn: positionData[3] as boolean,
-    rawAmount: positionData[0] as bigint,
+    withdrawn: positionData[3],
+    rawAmount: positionData[0],
   } : null;
 
   // Deposit function
-  const deposit = async (amount: number, duration: number) => {
+  const deposit = async (amount: number, duration: number): Promise<boolean> => {
     if (!isConnected || !address) {
       showError('Please connect your wallet first');
       return false;
@@ -71,9 +83,10 @@ export function useContract() {
       
       showSuccess(`Deposit transaction submitted! Hash: ${txHash.slice(0, 10)}...`);
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Deposit error:', error);
-      showError(parseErrorMessage(error));
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      showError(parseErrorMessage(errorMessage));
       return false;
     } finally {
       setIsLoading(false);
@@ -81,7 +94,7 @@ export function useContract() {
   };
 
   // Withdraw function
-  const withdraw = async () => {
+  const withdraw = async (): Promise<boolean> => {
     if (!isConnected || !address) {
       showError('Please connect your wallet first');
       return false;
@@ -103,9 +116,10 @@ export function useContract() {
       
       showSuccess(`Withdrawal transaction submitted! Hash: ${txHash.slice(0, 10)}...`);
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Withdraw error:', error);
-      showError(parseErrorMessage(error));
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      showError(parseErrorMessage(errorMessage));
       return false;
     } finally {
       setIsLoading(false);
@@ -113,7 +127,7 @@ export function useContract() {
   };
 
   // Refetch position after transactions
-  const refreshPosition = async () => {
+  const refreshPosition = async (): Promise<void> => {
     await refetchPosition();
   };
 
