@@ -20,17 +20,39 @@ export default function Footer() {
               Save ETH, earn interest, and grow your wealth with our secure savings platform.
             </p>
             <div className="flex gap-3">
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary-600 transition-colors">
-                <Github className="w-5 h-5" />
+              <a 
+                href="https://github.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-gray-500 hover:text-primary-600 transition-colors"
+                aria-label="Visit our GitHub repository"
+              >
+                <Github className="w-5 h-5" aria-hidden="true" />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary-600 transition-colors">
-                <Twitter className="w-5 h-5" />
+              <a 
+                href="https://twitter.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-gray-500 hover:text-primary-600 transition-colors"
+                aria-label="Follow us on Twitter"
+              >
+                <Twitter className="w-5 h-5" aria-hidden="true" />
               </a>
-              <a href="https://discord.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary-600 transition-colors">
-                <Discord className="w-5 h-5" />
+              <a 
+                href="https://discord.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-gray-500 hover:text-primary-600 transition-colors"
+                aria-label="Join our Discord community"
+              >
+                <Discord className="w-5 h-5" aria-hidden="true" />
               </a>
-              <a href="mailto:support@kinkox.com" className="text-gray-500 hover:text-primary-600 transition-colors">
-                <Mail className="w-5 h-5" />
+              <a 
+                href="mailto:support@kinkox.com" 
+                className="text-gray-500 hover:text-primary-600 transition-colors"
+                aria-label="Email our support team"
+              >
+                <Mail className="w-5 h-5" aria-hidden="true" />
               </a>
             </div>
           </div>
@@ -38,32 +60,105 @@ export default function Footer() {
           {/* Products */}
           <div>
             <h4 className="font-semibold mb-3 text-gray-900 dark:text-white">Products</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/dashboard" className="text-gray-600 dark:text-gray-400 hover:text-primary-600 transition-colors">Dashboard</Link></li>
-              <li><Link href="/deposit" className="text-gray-600 dark:text-gray-400 hover:text-primary-600 transition-colors">Deposit</Link></li>
-              <li><Link href="/history" className="text-gray-600 dark:text-gray-400 hover:text-primary-600 transition-colors">Transaction History</Link></li>
-              <li><Link href="/refer" className="text-gray-600 dark:text-gray-400 hover:text-primary-600 transition-colors">Referral Program</Link></li>
+            <ul className="space-y-2 text-sm" aria-label="Product navigation">
+              <li>
+                <Link 
+                  href="/dashboard" 
+                  className="text-gray-600 dark:text-gray-400 hover:text-primary-600 transition-colors"
+                  aria-label="Go to Dashboard"
+                >
+                  Dashboard
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/deposit" 
+                  className="text-gray-600 dark:text-gray-400 hover:text-primary-600 transition-colors"
+                  aria-label="Go to Deposit page"
+                >
+                  Deposit
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/history" 
+                  className="text-gray-600 dark:text-gray-400 hover:text-primary-600 transition-colors"
+                  aria-label="View transaction history"
+                >
+                  Transaction History
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/refer" 
+                  className="text-gray-600 dark:text-gray-400 hover:text-primary-600 transition-colors"
+                  aria-label="View referral program"
+                >
+                  Referral Program
+                </Link>
+              </li>
             </ul>
           </div>
 
           {/* Resources */}
           <div>
             <h4 className="font-semibold mb-3 text-gray-900 dark:text-white">Resources</h4>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary-600 transition-colors">Documentation</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary-600 transition-colors">FAQ</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary-600 transition-colors">Terms of Service</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary-600 transition-colors">Privacy Policy</a></li>
+            <ul className="space-y-2 text-sm" aria-label="Resource links">
+              <li>
+                <a 
+                  href="#" 
+                  className="text-gray-600 dark:text-gray-400 hover:text-primary-600 transition-colors"
+                  aria-label="Read documentation"
+                >
+                  Documentation
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="#" 
+                  className="text-gray-600 dark:text-gray-400 hover:text-primary-600 transition-colors"
+                  aria-label="Read frequently asked questions"
+                >
+                  FAQ
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="#" 
+                  className="text-gray-600 dark:text-gray-400 hover:text-primary-600 transition-colors"
+                  aria-label="Read terms of service"
+                >
+                  Terms of Service
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="#" 
+                  className="text-gray-600 dark:text-gray-400 hover:text-primary-600 transition-colors"
+                  aria-label="Read privacy policy"
+                >
+                  Privacy Policy
+                </a>
+              </li>
             </ul>
           </div>
 
           {/* Contact */}
           <div>
             <h4 className="font-semibold mb-3 text-gray-900 dark:text-white">Contact</h4>
-            <ul className="space-y-2 text-sm">
-              <li className="text-gray-600 dark:text-gray-400">Email: support@kinkox.com</li>
-              <li className="text-gray-600 dark:text-gray-400">Telegram: @kinkox_support</li>
-              <li className="text-gray-600 dark:text-gray-400">Contract: 0xc55c...9F0e</li>
+            <ul className="space-y-2 text-sm" aria-label="Contact information">
+              <li className="text-gray-600 dark:text-gray-400">
+                <span className="sr-only">Email:</span>
+                Email: support@kinkox.com
+              </li>
+              <li className="text-gray-600 dark:text-gray-400">
+                <span className="sr-only">Telegram:</span>
+                Telegram: @kinkox_support
+              </li>
+              <li className="text-gray-600 dark:text-gray-400">
+                <span className="sr-only">Contract address:</span>
+                Contract: 0xc55c...9F0e
+              </li>
             </ul>
           </div>
         </div>
@@ -71,7 +166,7 @@ export default function Footer() {
         {/* Copyright */}
         <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-800 text-center">
           <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center justify-center gap-1">
-            Made with <Heart className="w-4 h-4 text-red-500 fill-current" /> by Team KinkoX
+            Made with <Heart className="w-4 h-4 text-red-500 fill-current" aria-hidden="true" /> by Team KinkoX
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
             © {currentYear} KinkoX. All rights reserved.
