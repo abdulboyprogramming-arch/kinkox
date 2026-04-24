@@ -34,7 +34,11 @@ export default function Toast({ type, message, onClose, duration = 5000 }: Toast
     <div className={`fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg border ${backgrounds[type]} shadow-lg animate-slideIn`}>
       {icons[type]}
       <span className="text-sm text-gray-700 dark:text-gray-300">{message}</span>
-      <button onClick={onClose} className="ml-2 hover:opacity-70">
+      <button 
+        onClick={onClose} 
+        className="ml-2 hover:opacity-70"
+        aria-label="Close notification"
+      >
         <X className="w-4 h-4 text-gray-500" />
       </button>
     </div>
